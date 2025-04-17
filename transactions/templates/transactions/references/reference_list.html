@@ -1,0 +1,228 @@
+{% extends 'base.html' %} {% block content %}
+<div class="container mt-4">
+  <h1 class="mb-4">Управление справочниками</h1>
+
+  <div class="row mb-4">
+    <div class="col">
+      <a href="{% url 'transactions:record_list' %}" class="btn btn-primary"
+        >Вернуться к записям</a
+      >
+    </div>
+  </div>
+
+  <div class="row">
+    <!-- Статусы -->
+    <div class="col-md-6 mb-4">
+      <div class="card h-100">
+        <div
+          class="card-header d-flex justify-content-between align-items-center"
+        >
+          <h5 class="mb-0">Статусы</h5>
+          <a
+            href="{% url 'transactions:status_create' %}"
+            class="btn btn-sm btn-primary"
+            >Добавить</a
+          >
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-striped table-hover">
+              <thead>
+                <tr>
+                  <th>Название</th>
+                  <th>Действия</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for status in statuses %}
+                <tr>
+                  <td>{{ status.name }}</td>
+                  <td>
+                    <div class="btn-group btn-group-sm">
+                      <a
+                        href="{% url 'transactions:status_update' status.id %}"
+                        class="btn btn-outline-primary"
+                        >Изменить</a
+                      >
+                      <a
+                        href="{% url 'transactions:status_delete' status.id %}"
+                        class="btn btn-outline-danger"
+                        >Удалить</a
+                      >
+                    </div>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="2" class="text-center">Нет данных</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Типы операций -->
+    <div class="col-md-6 mb-4">
+      <div class="card h-100">
+        <div
+          class="card-header d-flex justify-content-between align-items-center"
+        >
+          <h5 class="mb-0">Типы операций</h5>
+          <a
+            href="{% url 'transactions:type_create' %}"
+            class="btn btn-sm btn-primary"
+            >Добавить</a
+          >
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-striped table-hover">
+              <thead>
+                <tr>
+                  <th>Название</th>
+                  <th>Действия</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for type in types %}
+                <tr>
+                  <td>{{ type.name }}</td>
+                  <td>
+                    <div class="btn-group btn-group-sm">
+                      <a
+                        href="{% url 'transactions:type_update' type.id %}"
+                        class="btn btn-outline-primary"
+                        >Изменить</a
+                      >
+                      <a
+                        href="{% url 'transactions:type_delete' type.id %}"
+                        class="btn btn-outline-danger"
+                        >Удалить</a
+                      >
+                    </div>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="2" class="text-center">Нет данных</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <!-- Категории -->
+    <div class="col-md-6 mb-4">
+      <div class="card h-100">
+        <div
+          class="card-header d-flex justify-content-between align-items-center"
+        >
+          <h5 class="mb-0">Категории</h5>
+          <a
+            href="{% url 'transactions:category_create' %}"
+            class="btn btn-sm btn-primary"
+            >Добавить</a>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-striped table-hover">
+              <thead>
+                <tr>
+                  <th>Название</th>
+                  <th>Тип операции</th>
+                  <th>Действия</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for category in categories %}
+                <tr>
+                  <td>{{ category.name }}</td>
+                  <td>{{ category.operations_type.name }}</td>
+                  <td>
+                    <div class="btn-group btn-group-sm">
+                      <a
+                        href="{% url 'transactions:category_update' category.id %}"
+                        class="btn btn-outline-primary"
+                        >Изменить</a>
+                      <a
+                        href="{% url 'transactions:category_delete' category.id %}"
+                        class="btn btn-outline-danger"
+                        >Удалить</a>
+                    </div>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="3" class="text-center">Нет данных</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Подкатегории -->
+    <div class="col-md-6 mb-4">
+      <div class="card h-100">
+        <div
+          class="card-header d-flex justify-content-between align-items-center"
+        >
+          <h5 class="mb-0">Подкатегории</h5>
+          <a
+            href="{% url 'transactions:subcategory_create' %}"
+            class="btn btn-sm btn-primary"
+            >Добавить</a
+          >
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-striped table-hover">
+              <thead>
+                <tr>
+                  <th>Название</th>
+                  <th>Категория</th>
+                  <th>Действия</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for subcategory in subcategories %}
+                <tr>
+                  <td>{{ subcategory.name }}</td>
+                  <td>{{ subcategory.category.name }}</td>
+                  <td>
+                    <div class="btn-group btn-group-sm">
+                      <a
+                        href="{% url 'transactions:subcategory_update' subcategory.id %}"
+                        class="btn btn-outline-primary"
+                        >Изменить</a>
+                      <a
+                        href="{% url 'transactions:subcategory_delete' subcategory.id %}"
+                        class="btn btn-outline-danger"
+                        >Удалить</a>
+                    </div>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="3" class="text-center">Нет данных</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

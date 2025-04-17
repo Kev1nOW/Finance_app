@@ -1,0 +1,174 @@
+{% extends 'base.html' %} {% block content %}
+<div class="container mt-4">
+  <h1 class="mb-4">Учет движения денежных средств</h1>
+
+  <div class="row mb-4">
+    <div class="col">
+      <a href="{% url 'transactions:record_create' %}" class="btn btn-primary"
+        >Создать запись</a>
+      <a
+        href="{% url 'transactions:reference_list' %}"
+        class="btn btn-secondary"
+        >Управление справочниками</a>
+    </div>
+  </div>
+
+  <!-- Панель фильтров -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h5 class="mb-0">Фильтры</h5>
+    </div>
+    <div class="card-body">
+      <form method="get" id="filter-form">
+        <div class="row">
+          <div class="col-md-3 mb-3">
+            <label for="id_date_from">Дата с:</label>
+            {{ filter.form.date_from }}
+          </div>
+          <div class="col-md-3 mb-3">
+            <label for="id_date_to">Дата по:</label>
+            {{ filter.form.date_to }}
+          </div>
+          <div class="col-md-3 mb-3">
+            <label for="id_status">Статус:</label>
+            {{ filter.form.status }}
+          </div>
+          <div class="col-md-3 mb-3">
+            <label for="id_operations_type">Тип операции:</label>
+            {{ filter.form.operations_type }}
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="id_category">Категория:</label>
+            {{ filter.form.category }}
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="id_subcategory">Подкатегория:</label>
+            {{ filter.form.subcategory }}
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <button type="submit" class="btn btn-primary">
+              Применить фильтры
+            </button>
+            <a
+              href="{% url 'transactions:record_list' %}"
+              class="btn btn-outline-secondary"
+              >Сбросить</a>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Таблица записей -->
+  <div class="card">
+    <div class="card-header">
+      <h5 class="mb-0">Записи ДДС</h5>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-striped table-hover">
+        <thead>
+          <tr>
+            <th>Дата</th>
+            <th>Статус</th>
+            <th>Тип операции</th>
+            <th>Категория</th>
+            <th>Подкатегория</th>
+            <th class="text-end">Сумма (руб.)</th>
+            <th>Комментарий</th>
+            <th>Действия</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if records %} {% for record in records %}
+          <tr>
+            <td>{{ record.date|date:"d.m.Y" }}</td>
+            <td>{{ record.status }}</td>
+            <td>{{ record.operations_type }}</td>
+            <td>{{ record.category }}</td>
+            <td>{{ record.subcategory }}</td>
+            <td class="text-end">{{ record.amount|floatformat:2 }}</td>
+            <td>{{ record.comment|default:"-" }}</td>
+            <td>
+              <div class="btn-group btn-group-sm">
+                <a
+                  href="{% url 'transactions:record_update' record.id %}"
+                  class="btn btn-outline-primary"
+                  >Изменить</a
+                >
+                <a
+                  href="{% url 'transactions:record_delete' record.id %}"
+                  class="btn btn-outline-danger"
+                  >Удалить</a
+                >
+              </div>
+            </td>
+          </tr>
+          {% endfor %} {% else %}
+          <tr>
+            <td colspan="8" class="text-center">Нет записей</td>
+          </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- JavaScript для динамической фильтрации -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const operationsTypeSelect = document.getElementById('id_operations_type');
+    const categorySelect = document.getElementById('id_category');
+
+    // Обновление списка категорий при изменении типа операции
+    if (operationsTypeSelect) {
+      operationsTypeSelect.addEventListener('change', function () {
+        const typeId = this.value;
+        if (typeId) {
+          fetch(`/api/categories-by-type/?type_id=${typeId}`)
+            .then((response) => response.json())
+            .then((data) => {
+              categorySelect.innerHTML = '<option value="">---------</option>';
+              data.forEach((category) => {
+                const option = document.createElement('option');
+                option.value = category.id;
+                option.textContent = category.name;
+                categorySelect.appendChild(option);
+              });
+              categorySelect.dispatchEvent(new Event('change'));
+            });
+        }
+      });
+    }
+
+    // Обновление списка подкатегорий при изменении категории
+    if (categorySelect) {
+      categorySelect.addEventListener('change', function () {
+        const categoryId = this.value;
+        const subcategorySelect = document.getElementById('id_subcategory');
+
+        if (categoryId) {
+          fetch(`/api/subcategories-by-category/?category_id=${categoryId}`)
+            .then((response) => response.json())
+            .then((data) => {
+              subcategorySelect.innerHTML =
+                '<option value="">---------</option>';
+              data.forEach((subcategory) => {
+                const option = document.createElement('option');
+                option.value = subcategory.id;
+                option.textContent = subcategory.name;
+                subcategorySelect.appendChild(option);
+              });
+            });
+        } else {
+          subcategorySelect.innerHTML = '<option value="">---------</option>';
+        }
+      });
+    }
+  });
+</script>
+{% endblock %}
